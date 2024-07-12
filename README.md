@@ -39,16 +39,13 @@ function flashLoan(
 
 Used Encoding/Decoding or Call Method: call
 
-Explanation
+### Explanation
 
-Purpose:
-The flashLoan function allows users to borrow assets without collateral, provided that the borrowed amount is returned along with a fee within the same transaction.
+**Purpose:**  
+The `flashLoan` function allows users to borrow assets without collateral, provided that the borrowed amount is returned along with a fee within the same transaction.
 
-Detailed Usage:
-The flashLoan function uses the call method indirectly through the safeTransfer function and executeOperation function. The call method in this context is used to transfer tokens to the receiverAddress and then invoke the executeOperation function on the IFlashLoanReceiver contract. The call method provides flexibility and control over the contract interaction, ensuring that the transfer and subsequent operations are handled atomically.
+**Detailed Usage:**  
+The `flashLoan` function uses the `call` method indirectly through the `safeTransfer` function and `executeOperation` function. The `call` method in this context is used to transfer tokens to the `receiverAddress` and then invoke the `executeOperation` function on the `IFlashLoanReceiver` contract. The `call` method provides flexibility and control over the contract interaction, ensuring that the transfer and subsequent operations are handled atomically.
 
-Impact:
-The call method in this function is crucial for executing the flash loan. It ensures that the assets are transferred securely to the borrower's contract, and the borrower's contract's custom logic is executed correctly. This enables the flash loan functionality, which is a core feature of the Aave protocol, allowing users to leverage arbitrage opportunities, refinance loans, and execute complex financial strategies within a single transaction.
-
-Conclusion
-The flashLoan function in the Aave protocol's LendingPool contract exemplifies the use of the call method to facilitate advanced financial operations securely and efficiently. By enabling flash loans, Aave provides users with powerful tools to optimize their financial strategies and contribute to the overall liquidity and functionality of the DeFi ecosystem.
+**Impact:**  
+The `call` method in this function is crucial for executing the flash loan. It ensures that the assets are transferred securely to the borrower's contract, and the borrower's contract's custom logic is executed correctly. This enables the flash loan functionality, which is a core feature of the Aave protocol, allowing users to leverage arbitrage opportunities, refinance loans, and execute complex financial strategies within a single transaction.
