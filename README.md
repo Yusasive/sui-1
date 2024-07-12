@@ -11,30 +11,72 @@
 **Function Code:**
 
 ```solidity
-function flashLoan(
-    address receiverAddress,
-    address[] calldata assets,
-    uint256[] calldata amounts,
-    uint256[] calldata modes,
-    address onBehalfOf,
-    bytes calldata params,
-    uint16 referralCode
-) external override nonReentrant {
+pragma solidity ^0.8.0;
+
+import "./IERC20.sol";
+import "./IFlashLoanReceiver.sol";
+import "./SafeERC20.sol";
+import "./ReentrancyGuard.sol";
+
+contract AaveFlashLoan is ReentrancyGuard {
+    using SafeERC20 for IERC20;
+
     // Code omitted for brevity
-    for (uint256 i = 0; i < assets.length; i++) {
-        // Other code omitted for brevity
-        IERC20(assets[i]).safeTransfer(receiverAddress, amounts[i]);
+
+    function flashLoan(
+        address receiverAddress,
+        address[] calldata assets,
+        uint256[] calldata amounts,
+        uint256[] calldata modes,
+        address onBehalfOf,
+        bytes calldata params,
+        uint16 referralCode
+    ) external override nonReentrant {
+        // Code omitted for brevity
+
+        // Initialize premiums array
+        uint256[] memory premiums = new uint256[](assets.length);
+        for (uint256 i = 0; i < assets.length; i++) {
+            // Set the premium for the asset
+            premiums[i] = (amounts[i] * 9) / 10000; // Example premium calculation
+
+            // Transfer the borrowed assets to the receiver
+            IERC20(assets[i]).safeTransfer(receiverAddress, amounts[i]);
+        }
+
+        // Execute the operation on the receiver contract
+        IFlashLoanReceiver(receiverAddress).executeOperation(
+            assets,
+            amounts,
+            premiums,
+            msg.sender,
+            params
+        );
+
+        // More code omitted for brevity
+
+        // Ensure the assets are returned with the premiums
+        for (uint256 i = 0; i < assets.length; i++) {
+            uint256 amountOwing = amounts[i] + premiums[i];
+            IERC20(assets[i]).safeTransferFrom(receiverAddress, address(this), amountOwing);
+        }
+
+        // Emit an event for the flash loan
+        emit FlashLoanExecuted(receiverAddress, assets, amounts, premiums, msg.sender);
     }
 
-    IFlashLoanReceiver(receiverAddress).executeOperation(
-        assets,
-        amounts,
-        premiums,
-        msg.sender,
-        params
+    // Event declaration
+    event FlashLoanExecuted(
+        address indexed receiver,
+        address[] assets,
+        uint256[] amounts,
+        uint256[] premiums,
+        address initiator
     );
-    // More code omitted for brevity
+
+    // Code omitted for brevity
 }
+
 
 
 Used Encoding/Decoding or Call Method: call
